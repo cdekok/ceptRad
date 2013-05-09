@@ -1,0 +1,26 @@
+{
+    "name": "cept/cept-rad",
+    "description": "a module to provide RAD capabilities to ZF2",
+    "type": "library",
+    "keywords": [
+        "library",
+        "cept"
+    ],
+    "authors": [
+        {
+            "name": "Chris de Kok",
+            "homepage": "http://con.cept.me"
+        }
+    ],
+    "homepage": "http://github.com/Mech7/ceptRad",
+    "license": "BSD-3-Clause",
+    "require": {
+        "php": ">=5.4.0",
+        "cept/cept": "dev-master",
+    },
+    "autoload": {
+        "psr-0": {
+            "CeptRad": "src/"
+        }
+    }
+}
