@@ -25,7 +25,8 @@ class Module implements ConsoleBannerProviderInterface
 
     public function getConsoleBanner(AdapterInterface $console)
     {
-        return 'Cept Scaffold module 0.0.1';
+        $figlet = new \Zend\Text\Figlet\Figlet();
+        return $figlet->render('CEPTRAD');
     }
 
     public function getConsoleUsage(Console $console) {
