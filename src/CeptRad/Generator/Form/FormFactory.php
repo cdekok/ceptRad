@@ -1,6 +1,13 @@
 <?php
 namespace CeptRad\Generator\Form;
 
+use Cept\Db\Db;
+use CeptRad\Generator\Form\Adapter\Mysql;
+use InvalidArgumentException;
+use Zend\Db\Adapter\AdapterInterface;
+use Zend\EventManager\EventManagerInterface;
+use ZendTest\Form\TestAsset\Annotation\Form;
+
 class FormFactory
 {
     /**
@@ -15,22 +22,22 @@ class FormFactory
      * @param mixed $config
      * @return Form Form generator
      */
-    public static function factory($param)
+    public static function factory($param, EventManagerInterface $eventManager)
     {
-        if ($param instanceof \Zend\Db\Adapter\AdapterInterface) {
-            $db = new \Cept\Db\Db($param);
+        if ($param instanceof AdapterInterface) {
+            $db = new Db($param);
             $server = $db->getServer();
             $adapter = null;
             switch ($server) {
-                case \Cept\Db\Db::DB_MYSQL:
-                    $adapter = new \CeptRad\Generator\Form\Adapter\Mysql($param);
+                case Db::DB_MYSQL:
+                    $adapter = new Mysql($param);
                     break;
             }
         }
 
         if (!$adapter) {
-            throw new \InvalidArgumentException('Adapter not supported');
+            throw new InvalidArgumentException('Adapter not supported');
         }
-        return new Form($adapter);
+        return new Form($adapter, $eventManager);
     }
 }

@@ -27,7 +27,8 @@ class GenerateController extends AbstractConsoleController
         $srcPath = dirname($modReflection->getFileName()).'/src/';
         $namespace = $modReflection->getNamespaceName();
 
-        $generator  = \CeptRad\Generator\Form\FormFactory::factory($db);
+        $eventManager = $this->getEventManager();
+        $generator  = \CeptRad\Generator\Form\FormFactory::factory($db, $eventManager);
         $generator->generate($srcPath, $namespace);
         return 'Do something'.PHP_EOL;
     }

@@ -2,6 +2,11 @@
 namespace CeptRad\Generator\Form;
 
 use CeptRad\Generator\Form\Adapter\AdapterInterface;
+use Zend\Code\Generator\ClassGenerator;
+use Zend\Code\Generator\FileGenerator;
+use Zend\Code\Generator\MethodGenerator;
+use Zend\EventManager\EventManagerInterface;
+use Zend\Filter\Word\UnderscoreToCamelCase;
 
 class Form
 {
@@ -12,12 +17,19 @@ class Form
     protected $adapter;
 
     /**
+     * Event manager
+     * @var EventManagerInterface
+     */
+    protected $eventManager;
+
+    /**
      *
      * @param AdapterInterface $adapter
      */
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter, EventManagerInterface $eventManager)
     {
         $this->adapter = $adapter;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -44,16 +56,16 @@ class Form
      */
     public function createForm($srcPath, $namespace, $form)
     {
-        $file = new \Zend\Code\Generator\FileGenerator();
+        $file = new FileGenerator();
         $file->setUses(array('Zend\Form\Form'));
         $formNamespace = $namespace.'\Form';
         $file->setNamespace($formNamespace);
 
         $className = $this->underscoreToCamelCase($form);
-        $class = new \Zend\Code\Generator\ClassGenerator($className);
+        $class = new ClassGenerator($className);
         $class->setExtendedClass('Form');
 
-        $initElements = new \Zend\Code\Generator\MethodGenerator();
+        $initElements = new MethodGenerator();
         $initElements->setName('initElements');
 
         $class->addMethodFromGenerator($initElements);
@@ -77,7 +89,7 @@ class Form
      */
     public function underscoreToCamelCase($string)
     {
-        $filter = new \Zend\Filter\Word\UnderscoreToCamelCase();
+        $filter = new UnderscoreToCamelCase();
         return $filter->filter($string);
     }
 }
