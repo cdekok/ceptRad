@@ -24,7 +24,7 @@ class GenerateController extends AbstractConsoleController
         }
 
         $modReflection = new \ReflectionClass($module);
-        $srcPath = dirname($modReflection->getFileName().'/src/');
+        $srcPath = dirname($modReflection->getFileName()).'/src/';
         $namespace = $modReflection->getNamespaceName();
 
         $generator  = \CeptRad\Generator\Form\FormFactory::factory($db);
