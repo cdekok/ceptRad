@@ -50,7 +50,7 @@ class Form
         $file->setNamespace($formNamespace);
 
         $className = $this->underscoreToCamelCase($form);
-        $class = new \Zend\Code\Generator\ClassGenerator($form);
+        $class = new \Zend\Code\Generator\ClassGenerator($className);
         $class->setExtendedClass('Form');
 
         $initElements = new \Zend\Code\Generator\MethodGenerator();
@@ -60,8 +60,12 @@ class Form
 
         $file->setClass($class);
         $namespaceDir = str_replace('\\', '/', $formNamespace);
-        $filePath = $srcPath.$namespaceDir.'/'.$className.'.php';
-        $file->write($filePath);
+        $fileDir = $srcPath.$namespaceDir.'/';
+        if (!is_dir($fileDir)) {
+            mkdir($fileDir, 0644, true);
+        }
+        $file->setFilename($fileDir.$className.'.php');
+        $file->write();
     }
 
     /**
