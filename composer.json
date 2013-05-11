@@ -1,5 +1,5 @@
 {
-    "name": "cept/cept-rad",
+    "name": "cept/cept-zf2mod-rad",
     "description": "a module to provide RAD capabilities to ZF2",
     "type": "library",
     "keywords": [
