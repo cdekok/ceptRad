@@ -76,6 +76,13 @@ class Form implements EventManagerAwareInterface
         $class = new ClassGenerator($className);
         $class->setExtendedClass('Form');
 
+        $construct = new MethodGenerator('__construct');
+        $constructParam = new \Zend\Code\Generator\ParameterGenerator('name', 'string', $form);
+        $constructOptionsParam = new \Zend\Code\Generator\ParameterGenerator('options', 'array', array());
+        $construct->setParameters(array($constructParam, $constructOptionsParam));
+        $construct->setBody($this->getConstructBody());
+        $class->addMethodFromGenerator($construct);
+
         $initElements = new MethodGenerator();
         $initElements->setName('initElements');
         $initElements->setBody($this->getBodyInitElements($form));
@@ -93,6 +100,17 @@ class Form implements EventManagerAwareInterface
         $file->setFilename($filePath);
         $file->write();
         return $filePath;
+    }
+
+    /**
+     * Get body for form constructor method
+     * @return string
+     */
+    protected function getConstructBody()
+    {
+        $body = '$this->initElements();'."\n";
+        $body .= 'parent::construct($name, $options);'."\n";
+        return $body;
     }
 
     /**
