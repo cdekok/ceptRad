@@ -94,24 +94,35 @@ class Form implements EventManagerAwareInterface
         $fields = $this->adapter->getFormFields($form);
         $bodyStr = '';
         foreach ($fields as $field) {
-            $bodyStr .= $this->getBodyElement($field)."\n";
+            $bodyStr .= $this->getBodyElement($form, $field)."\n\n";
         }
         return $bodyStr;
     }
 
     /**
      * Get body for one form element
+     *
+     * @param string $form
      * @param string $element
      * @return string
      */
-    protected function getBodyElement($element)
+    protected function getBodyElement($form, $element)
     {
         $elementArray = array(
             'name' => $element,
             'attributes' => array(
-                'type' => 'text'
+                'type' => $this->adapter->getFieldType($form, $element)
+            ),
+            'options' => array(
+                'label' => ucfirst(str_replace('_', ' ', $element))
             )
         );
+
+        // Add validators
+        $validators = $this->adapter->getFieldValidators($form, $element);
+        if (!empty($validators)) {
+            $elementArray['validators'] = $validators;
+        }
 
         $valGenerator = new \Zend\Code\Generator\ValueGenerator($elementArray);
         $bodyStr = '$this->add('.$valGenerator->generate().');';
@@ -130,7 +141,6 @@ class Form implements EventManagerAwareInterface
         $filter = new UnderscoreToCamelCase();
         return $filter->filter($string);
     }
-
 
     /**
      * Set event manager

@@ -17,4 +17,20 @@ interface AdapterInterface
      * @return array
      */
     public function getFormFields($form);
+
+    /**
+     * Get field element type
+     *
+     * @return string
+     */
+    public function getFieldType($form, $field);
+
+    /**
+     * Get form element validators
+     *
+     * @param string $form
+     * @param string $field
+     * @return array
+     */
+    public function getFieldValidators($form, $field);
 }

@@ -61,6 +61,62 @@ class DbAdapter implements AdapterInterface
     }
 
     /**
+     * Get element type
+     *
+     * @param string $form
+     * @param string $field
+     * @return string
+     */
+    public function getFieldType($form, $field)
+    {
+        $column = $this->getMetadata()->getColumn($field, $form);
+        $dataType = $column->getDataType();
+        $fieldType = null;
+        switch ($dataType) {
+            case 'text':
+                $fieldType = 'Textarea';
+                break;
+            case 'timestamp':
+                $fieldType = 'Date';
+                break;
+            case 'tinyint':
+            case 'boolean':
+                $fieldType = 'Checkbox';
+                break;
+            case 'text':
+                $fieldType = 'Textarea';
+                break;
+            default:
+                $fieldType = 'Text';
+                break;
+        }
+        return $fieldType;
+    }
+
+    /**
+     * Get form element validators
+     *
+     * @param string $form
+     * @param string $element
+     * @return array
+     */
+    public function getFieldValidators($form, $element)
+    {
+        $column = $this->getMetadata()->getColumn($element, $form);
+        $validators = array();
+        if ($column->getCharacterMaximumLength()) {
+            $validators[] = array(
+                'name' => 'StringLength',
+                'options' => array(
+                    'encoding' => 'UTF-8',
+                    'max'      => $column->getCharacterMaximumLength()
+                )
+            );
+        }
+        return $validators;
+    }
+
+    /**
      * Get database metadata
      * @return Metadata
      */
