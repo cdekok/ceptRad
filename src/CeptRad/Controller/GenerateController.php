@@ -34,7 +34,21 @@ class GenerateController extends AbstractConsoleController
         );
         $generatorAdapter  = new \CeptRad\Generator\Form\Adapter\DbAdapter($db, $options);
         $generator = new \CeptRad\Generator\Form\Form($generatorAdapter, array('eventManager' => $eventManager));
+
+        // Listen to event when form is created
+        $eventManager->attach(\CeptRad\Generator\Form\Form::EVENT_POST_SAVE_FORM, array($this, 'formCreated'));
         $generator->generate($srcPath, $namespace);
         return 'Done..'.PHP_EOL;
+    }
+
+    /**
+     * Notification after form creation
+     *
+     * @param \Zend\EventManager\Event $event
+     */
+    public function formCreated(\Zend\EventManager\Event $event)
+    {
+        $form = $event->getParam('file');
+        echo 'Created form at :'.$form.PHP_EOL;
     }
 }

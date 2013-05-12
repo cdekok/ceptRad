@@ -26,6 +26,11 @@ class Form implements EventManagerAwareInterface
     protected $eventManager;
 
     /**
+     * Event triggered after saving form
+     */
+    const EVENT_POST_SAVE_FORM = 'CeptRad\Generator\Form\Form\PostSaveForm';
+
+    /**
      *
      * @param AdapterInterface $adapter
      */
@@ -45,7 +50,10 @@ class Form implements EventManagerAwareInterface
     {
         $forms = $this->adapter->getForms();
         foreach ($forms as $form) {
-            $this->createForm($srcPath, $namespace, $form);
+            $file = $this->createForm($srcPath, $namespace, $form);
+            if ($this->getEventManager()) {
+                $this->getEventManager()->trigger(self::EVENT_POST_SAVE_FORM, $this, array('file' => $file));
+            }
         }
     }
 
@@ -55,7 +63,7 @@ class Form implements EventManagerAwareInterface
      * @param type $srcPath
      * @param type $namespace
      * @param type $form
-     * @return void
+     * @return string Absolute path to the file created
      */
     public function createForm($srcPath, $namespace, $form)
     {
@@ -80,8 +88,11 @@ class Form implements EventManagerAwareInterface
         if (!is_dir($fileDir)) {
             mkdir($fileDir, 0644, true);
         }
-        $file->setFilename($fileDir.$className.'.php');
+
+        $filePath = $fileDir.$className.'.php';
+        $file->setFilename($filePath);
         $file->write();
+        return $filePath;
     }
 
     /**
