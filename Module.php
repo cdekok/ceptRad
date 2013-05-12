@@ -41,7 +41,8 @@ class Module implements ConsoleBannerProviderInterface
             array(
                 'module', 'The module name where the form\'s will be generated',
                 '--schema=', 'The database schema to generate the forms from',
-                '--table=', 'Single table to generate form from'
+                '--table=', 'Single table to generate form from',
+                '--force=', 'Overwrite all files do not ask questions'
             ),
         );
     }

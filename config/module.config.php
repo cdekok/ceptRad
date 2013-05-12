@@ -14,7 +14,7 @@ return array(
                 ),
                 'generate-crud' => array(
                     'options' => array(
-                        'route'    => 'rad crud <module> [--schema=] [--table=]',
+                        'route'    => 'rad crud <module> [--schema=] [--table=] [--force]',
                         'defaults' => array(
                             'controller' => 'CeptRad\Controller\GenerateController',
                             'action'     => 'crud'
