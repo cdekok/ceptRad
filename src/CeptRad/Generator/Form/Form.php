@@ -154,8 +154,10 @@ class Form implements EventManagerAwareInterface
         }
 
         $valGenerator = new \Zend\Code\Generator\ValueGenerator($elementArray);
-        $bodyStr = '$this->add('.$valGenerator->generate().');';
-        return $bodyStr;
+        $body = '$this->add('."\n";
+        $body .= '    '.$valGenerator->generate()."\n";
+        $body .= ');';
+        return $body;
     }
 
     /**
