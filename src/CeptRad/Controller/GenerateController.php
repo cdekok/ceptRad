@@ -3,10 +3,29 @@ namespace CeptRad\Controller;
 
 class GenerateController extends AbstractConsoleController
 {
+    /**
+     * Scaffold CRUD code from database tables
+     *
+     * @return type
+     */
+    public function crudAction()
+    {
+        $db = $this->getDb();
+        if (!$db) {
+            return 'Database not configured in service locator'.PHP_EOL;
+        }
+        return 'Generating CRUD...'.PHP_EOL;
+    }
+
+    /**
+     * Form generator
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
     public function formAction()
     {
-        // Check if we have a db
-        $db = $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
+        $db = $this->getDb();
         if (!$db) {
             return 'Database not configured in service locator'.PHP_EOL;
         }
@@ -50,5 +69,14 @@ class GenerateController extends AbstractConsoleController
     {
         $form = $event->getParam('file');
         echo 'Created form at :'.$form.PHP_EOL;
+    }
+
+    /**
+     * Get database adapter
+     * @return \Zend\Db\Adapter\Adapter
+     */
+    protected function getDb()
+    {
+        return $this->getServiceLocator()->get('Zend\Db\Adapter\Adapter');
     }
 }

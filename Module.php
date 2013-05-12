@@ -31,9 +31,13 @@ class Module implements ConsoleBannerProviderInterface
 
     public function getConsoleUsage(Console $console) {
         return array(
-            // Commands
             'rad form <module>'    => 'Generate form\'s based on database tables',
-            // Parameters
+            array(
+                'module', 'The module name where the form\'s will be generated',
+                '--schema=', 'The database schema to generate the forms from',
+                '--table=', 'Single table to generate form from'
+            ),
+            'rad crud <module>'    => 'Generate form\'s based on database tables',
             array(
                 'module', 'The module name where the form\'s will be generated',
                 '--schema=', 'The database schema to generate the forms from',
