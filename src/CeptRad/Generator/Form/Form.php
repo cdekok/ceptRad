@@ -5,6 +5,8 @@ use CeptRad\Generator\Form\Adapter\AdapterInterface;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 use Zend\Code\Generator\MethodGenerator;
+use Zend\Code\Generator\ParameterGenerator;
+use Zend\Code\Generator\ValueGenerator;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Filter\Word\UnderscoreToCamelCase;
@@ -77,8 +79,8 @@ class Form implements EventManagerAwareInterface
         $class->setExtendedClass('Form');
 
         $construct = new MethodGenerator('__construct');
-        $constructParam = new \Zend\Code\Generator\ParameterGenerator('name', 'string', $form);
-        $constructOptionsParam = new \Zend\Code\Generator\ParameterGenerator('options', 'array', array());
+        $constructParam = new ParameterGenerator('name', 'string', $form);
+        $constructOptionsParam = new ParameterGenerator('options', 'array', array());
         $construct->setParameters(array($constructParam, $constructOptionsParam));
         $construct->setBody($this->getConstructBody());
         $class->addMethodFromGenerator($construct);
@@ -153,7 +155,7 @@ class Form implements EventManagerAwareInterface
             $elementArray['validators'] = $validators;
         }
 
-        $valGenerator = new \Zend\Code\Generator\ValueGenerator($elementArray);
+        $valGenerator = new ValueGenerator($elementArray);
         $body = '$this->add('."\n";
         $body .= '    '.$valGenerator->generate()."\n";
         $body .= ');';
