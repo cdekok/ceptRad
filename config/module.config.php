@@ -5,7 +5,7 @@ return array(
             'routes' => array(
                 'generate-forms' => array(
                     'options' => array(
-                        'route'    => 'rad form <module>',
+                        'route'    => 'rad form <module> [--schema=] [--table=]',
                         'defaults' => array(
                             'controller' => 'CeptRad\Controller\GenerateController',
                             'action'     => 'form'

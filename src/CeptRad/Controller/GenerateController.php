@@ -28,8 +28,13 @@ class GenerateController extends AbstractConsoleController
         $namespace = $modReflection->getNamespaceName();
 
         $eventManager = $this->getEventManager();
-        $generator  = \CeptRad\Generator\Form\FormFactory::factory($db, $eventManager);
+
+        $options = array(
+            'schema' => $request->getParam('schema')
+        );
+        $generatorAdapter  = new \CeptRad\Generator\Form\Adapter\DbAdapter($db, $options);
+        $generator = new \CeptRad\Generator\Form\Form($generatorAdapter, array('eventManager' => $eventManager));
         $generator->generate($srcPath, $namespace);
-        return 'Do something'.PHP_EOL;
+        return 'Done..'.PHP_EOL;
     }
 }

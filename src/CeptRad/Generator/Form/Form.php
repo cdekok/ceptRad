@@ -5,11 +5,14 @@ use CeptRad\Generator\Form\Adapter\AdapterInterface;
 use Zend\Code\Generator\ClassGenerator;
 use Zend\Code\Generator\FileGenerator;
 use Zend\Code\Generator\MethodGenerator;
+use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Filter\Word\UnderscoreToCamelCase;
 
-class Form
+class Form implements EventManagerAwareInterface
 {
+    use \Cept\Traits\Options;
+
     /**
      * Form adapter
      * @var AdapterInterface
@@ -26,10 +29,10 @@ class Form
      *
      * @param AdapterInterface $adapter
      */
-    public function __construct(AdapterInterface $adapter, EventManagerInterface $eventManager)
+    public function __construct(AdapterInterface $adapter, array $options = null)
     {
         $this->adapter = $adapter;
-        $this->eventManager = $eventManager;
+        $this->setOptions($options);
     }
 
     /**
@@ -67,6 +70,7 @@ class Form
 
         $initElements = new MethodGenerator();
         $initElements->setName('initElements');
+        $initElements->setBody($this->getBodyInitElements($form));
 
         $class->addMethodFromGenerator($initElements);
 
@@ -81,6 +85,40 @@ class Form
     }
 
     /**
+     * Get body for all form element
+     * @param string $form
+     * @return string
+     */
+    protected function getBodyInitElements($form)
+    {
+        $fields = $this->adapter->getFormFields($form);
+        $bodyStr = '';
+        foreach ($fields as $field) {
+            $bodyStr .= $this->getBodyElement($field)."\n";
+        }
+        return $bodyStr;
+    }
+
+    /**
+     * Get body for one form element
+     * @param string $element
+     * @return string
+     */
+    protected function getBodyElement($element)
+    {
+        $elementArray = array(
+            'name' => $element,
+            'attributes' => array(
+                'type' => 'text'
+            )
+        );
+
+        $valGenerator = new \Zend\Code\Generator\ValueGenerator($elementArray);
+        $bodyStr = '$this->add('.$valGenerator->generate().');';
+        return $bodyStr;
+    }
+
+    /**
      * Convert underscores name to camelcase to get the proper class name
      * for tables with underscores
      *
@@ -91,5 +129,25 @@ class Form
     {
         $filter = new UnderscoreToCamelCase();
         return $filter->filter($string);
+    }
+
+
+    /**
+     * Set event manager
+     * @param EventManagerInterface $eventManager
+     */
+    public function setEventManager(EventManagerInterface $eventManager)
+    {
+        $this->eventManager = $eventManager;
+        return $this;
+    }
+
+    /**
+     * Get event manager
+     * @return EventManagerInterface
+     */
+    public function getEventManager()
+    {
+        return $this->eventManager;
     }
 }

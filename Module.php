@@ -26,7 +26,7 @@ class Module implements ConsoleBannerProviderInterface
     public function getConsoleBanner(AdapterInterface $console)
     {
         $figlet = new \Zend\Text\Figlet\Figlet();
-        return $figlet->render('CEPTRAD');
+        return $figlet->render('RAD');
     }
 
     public function getConsoleUsage(Console $console) {
@@ -34,7 +34,11 @@ class Module implements ConsoleBannerProviderInterface
             // Commands
             'rad form <module>'    => 'Generate form\'s based on database tables',
             // Parameters
-            array( 'module',            'The module name where the form\'s will be generated' ),
+            array(
+                'module', 'The module name where the form\'s will be generated',
+                '--schema=', 'The database schema to generate the forms from',
+                '--table=', 'Single table to generate form from'
+            ),
         );
     }
 }
