@@ -81,6 +81,7 @@ class GenerateController extends AbstractConsoleController
 
         $tableGenerator = new \CeptRad\Generator\Table\Table();
         $tableFactoryGenerator = new \CeptRad\Generator\Table\TableServiceFactory();
+        $controllerGenerator = new \CeptRad\Generator\Controller\Controller();
         foreach ($tables as $table) {
             $tableGenerator->generate($table, $namespace.'\Db\TableGateway');
             $tableClassname = $tableGenerator->underscoreToCamelCase($table);
@@ -91,6 +92,12 @@ class GenerateController extends AbstractConsoleController
             $tableFactoryFile = $srcPath.$namespace.'/Db/TableGateway/'.$tableClassname.'ServiceFactory.php';
             $tableFactoryGenerator->write($tableFactoryFile);
             echo 'Table factory  written to: '.$tableFactoryFile.PHP_EOL;
+
+            $controllerGenerator->generate($table, $namespace.'\Controller');
+            $controllerFile = $srcPath.$namespace.'/Controller/'.$tableClassname.'Controller.php';
+            $controllerGenerator->write($controllerFile);
+            echo 'Controller written to: '.$controllerFile.PHP_EOL;
+
         }
         return 'Generating CRUD...'.PHP_EOL;
     }
