@@ -73,41 +73,13 @@ class GenerateController extends AbstractConsoleController
             'schema' => $schema
         );
 
-        $meta = new \Zend\Db\Metadata\Metadata($this->getDb());
-        $tables = $meta->getTableNames($options['schema']);
-
         $modReflection = new \ReflectionClass($this->module);
         $modulePath = dirname($modReflection->getFileName());
-        $srcPath = $modulePath.'/src/';
         $namespace = $modReflection->getNamespaceName();
 
-        $tableGenerator = new \CeptRad\Generator\Table\Table();
-        $tableFactoryGenerator = new \CeptRad\Generator\Table\TableServiceFactory();
-        $controllerGenerator = new \CeptRad\Generator\Controller\Controller();
-        $viewGenerator = new \CeptRad\Generator\View\Crud\ListView();
+        $crud = new \CeptRad\Generator\Crud\Crud($this->db);
+        $crud->generate($modulePath, $namespace);
 
-        foreach ($tables as $table) {
-            $tableGenerator->generate($table, $namespace.'\Db\TableGateway');
-            $tableClassname = $tableGenerator->underscoreToCamelCase($table);
-            $tableFile = $srcPath.$namespace.'/Db/TableGateway/'.$tableClassname.'.php';
-            $tableGenerator->write($tableFile);
-            echo 'Table written to: '.$tableFile.PHP_EOL;
-            $tableFactoryGenerator->generate($tableFile, $namespace.'\Db\TableGateway');
-            $tableFactoryFile = $srcPath.$namespace.'/Db/TableGateway/'.$tableClassname.'ServiceFactory.php';
-            $tableFactoryGenerator->write($tableFactoryFile);
-            echo 'Table factory  written to: '.$tableFactoryFile.PHP_EOL;
-
-            $controllerGenerator->generate($table, $namespace.'\Controller');
-            $controllerFile = $srcPath.$namespace.'/Controller/'.$tableClassname.'Controller.php';
-            $controllerGenerator->write($controllerFile);
-            echo 'Controller written to: '.$controllerFile.PHP_EOL;
-
-            $viewGenerator->generate($table, $meta->getColumnNames($table, $schema), $namespace);
-            $listView = $modulePath.'/view/'.$table.'/list.phtml';
-            $viewGenerator->write($listView);
-            echo 'View written to: '.$listView.PHP_EOL;
-
-        }
         return 'Generating CRUD...'.PHP_EOL;
     }
 

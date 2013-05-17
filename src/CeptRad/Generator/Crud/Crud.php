@@ -10,13 +10,25 @@ use Zend\EventManager\EventManagerInterface;
 
 class Crud implements EventManagerAwareInterface
 {
-    use Cept\Traits\Options;
+    use \Cept\Traits\Options;
 
     /**
      *
-     * @var \CeptRad\Generator\Crud\AdapterInterface
+     * @var \Zend\Db\Adapter\Adapter
      */
-    protected $adapter;
+    protected $db;
+
+    /**
+     * Db schema
+     * @var string
+     */
+    protected $schema;
+
+    /**
+     *
+     * @var \Zend\Db\Metadata\Metadata
+     */
+    protected $metadata;
 
     /**
      *
@@ -41,19 +53,32 @@ class Crud implements EventManagerAwareInterface
      * @param \CeptRad\Generator\Crud\AdapterInterface $adapter
      * @param array $options
      */
-    public function __construct(AdapterInterface $adapter, array $options = null)
+    public function __construct(\Zend\Db\Adapter\Adapter $db, array $options = null)
     {
-        $this->adapter = $adapter;
-        $this->setOptions($options);
+        $this->db = $db;
+        if ($options) {
+            $this->setOptions($options);
+        }
     }
 
     /**
      * Get adapter
-     * @return \CeptRad\Generator\Crud\AdapterInterface
+     * @return \Zend\Db\Adapter\Adapter
      */
-    public function getAdapter()
+    public function getDb()
     {
-        return $this->adapter;
+        return $this->db;
+    }
+
+    /**
+     * Set db
+     * @param \Zend\Db\Adapter\Adapter $db
+     * @return \CeptRad\Generator\Crud\Crud
+     */
+    public function setDb(\Zend\Db\Adapter\Adapter $db)
+    {
+        $this->db = $db;
+        return $this;
     }
 
     /**
@@ -121,27 +146,58 @@ class Crud implements EventManagerAwareInterface
      * Generate CRUD code for single table
      * @param string $name
      */
-    public function generate($name)
+    public function generate($modulePath, $namespace)
     {
-        $this->generateForm($name);
-        $this->generateController($name);
-        $this->generateView($name);
-        $this->generateRoute($name);
+        $tableGenerator = new \CeptRad\Generator\Table\Table();
+        $tableFactoryGenerator = new \CeptRad\Generator\Table\TableServiceFactory();
+        $controllerGenerator = new \CeptRad\Generator\Controller\Controller();
+        $viewGenerator = new \CeptRad\Generator\View\Crud\ListView();
+
+        $srcPath = $modulePath.'/src/';
+        $tables = $this->getMetaData()->getTableNames($this->schema);
+        foreach ($tables as $table) {
+            $tableGenerator->generate($table, $namespace.'\Db\TableGateway');
+            $tableClassname = $tableGenerator->underscoreToCamelCase($table);
+            $tableFile = $srcPath.$namespace.'/Db/TableGateway/'.$tableClassname.'.php';
+            $tableGenerator->write($tableFile);
+            echo 'Table written to: '.$tableFile.PHP_EOL;
+            $tableFactoryGenerator->generate($tableFile, $namespace.'\Db\TableGateway');
+            $tableFactoryFile = $srcPath.$namespace.'/Db/TableGateway/'.$tableClassname.'ServiceFactory.php';
+            $tableFactoryGenerator->write($tableFactoryFile);
+            echo 'Table factory  written to: '.$tableFactoryFile.PHP_EOL;
+
+            $controllerGenerator->generate($table, $namespace.'\Controller');
+            $controllerFile = $srcPath.$namespace.'/Controller/'.$tableClassname.'Controller.php';
+            $controllerGenerator->write($controllerFile);
+            echo 'Controller written to: '.$controllerFile.PHP_EOL;
+
+            $viewGenerator->generate($table, $this->getMetaData()->getColumnNames($table, $this->schema), $namespace);
+            $listView = $modulePath.'/view/'.$table.'/list.phtml';
+            $viewGenerator->write($listView);
+            echo 'View written to: '.$listView.PHP_EOL;
+        }
     }
 
-    protected function generateForm($name)
+    public function getSchema()
     {
+        return $this->schema;
     }
 
-    protected function generateController($name)
+    public function setSchema($schema)
     {
+        $this->schema = $schema;
+        return $this;
     }
 
-    protected function generateView($name)
+    /**
+     * Get metadata
+     * @return \Zend\Db\Metadata\Metadata
+     */
+    protected function getMetaData()
     {
-    }
-
-    protected function generateRoute($name)
-    {
+        if (!$this->metadata) {
+            $this->metadata = new \Zend\Db\Metadata\Metadata($this->getDb());
+        }
+        return $this->metadata;
     }
 }
