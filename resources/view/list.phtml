@@ -1,0 +1,33 @@
+<h1><?php echo $this->translate('List', '{module}');?></h1>
+<table class="table table-hover table-striped">
+<?php foreach($this->items as $item):?>
+    <tr>
+        <td><?php echo $this->escapeHtml($user->username);?></td>
+        <td class="btn-col">
+            <a class="btn" href="<?php echo $this->url('admin/eaditor/default', array(
+                'controller' => 'user',
+                'action' => 'detail'),
+                 array(
+                    'query' => array(
+                         'id' => $user->id
+                    )
+                ));?>">
+                <?php echo $this->translate('detail', 'Eaditor');?>
+            </a>
+        </td>
+        <td class="btn-col">
+            <a class="btn" href="<?php echo $this->url('admin/eaditor/default', array('controller' => 'user', 'action' => 'edit'), array('query' => array('id' => $user->id)));?>">
+                <?php echo $this->translate('edit', 'Eaditor');?>
+            </a>
+        </td>
+        <td class="btn-col">
+            <a
+                href="<?php echo $this->url('admin/eaditor/default', array('controller' => 'user', 'action' => 'delete'));?>"
+                class="delete btn btn-danger" id="<?php echo $user->id; ?>"><?php echo $this->translate('delete', 'Eaditor');?>
+            </a>
+        </td>
+    </tr>
+<?php endforeach; ?>
+</table>
+<?php echo $this->paginationControl($this->users,'Sliding','eaditor/pagination/sliding', array('route' => 'admin/eaditor/userList'));?>
+

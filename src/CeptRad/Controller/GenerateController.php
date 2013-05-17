@@ -68,20 +68,24 @@ class GenerateController extends AbstractConsoleController
         $eventManager = $this->getEventManager();
 
         $request = $this->getRequest();
+        $schema = $request->getParam('schema');
         $options = array(
-            'schema' => $request->getParam('schema')
+            'schema' => $schema
         );
 
         $meta = new \Zend\Db\Metadata\Metadata($this->getDb());
         $tables = $meta->getTableNames($options['schema']);
 
         $modReflection = new \ReflectionClass($this->module);
-        $srcPath = dirname($modReflection->getFileName()).'/src/';
+        $modulePath = dirname($modReflection->getFileName());
+        $srcPath = $modulePath.'/src/';
         $namespace = $modReflection->getNamespaceName();
 
         $tableGenerator = new \CeptRad\Generator\Table\Table();
         $tableFactoryGenerator = new \CeptRad\Generator\Table\TableServiceFactory();
         $controllerGenerator = new \CeptRad\Generator\Controller\Controller();
+        $viewGenerator = new \CeptRad\Generator\View\Crud\ListView();
+
         foreach ($tables as $table) {
             $tableGenerator->generate($table, $namespace.'\Db\TableGateway');
             $tableClassname = $tableGenerator->underscoreToCamelCase($table);
@@ -97,6 +101,11 @@ class GenerateController extends AbstractConsoleController
             $controllerFile = $srcPath.$namespace.'/Controller/'.$tableClassname.'Controller.php';
             $controllerGenerator->write($controllerFile);
             echo 'Controller written to: '.$controllerFile.PHP_EOL;
+
+            $viewGenerator->generate($table, $meta->getColumnNames($table, $schema), $namespace);
+            $listView = $modulePath.'/view/'.$table.'/list.phtml';
+            $viewGenerator->write($listView);
+            echo 'View written to: '.$listView.PHP_EOL;
 
         }
         return 'Generating CRUD...'.PHP_EOL;
