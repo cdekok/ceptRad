@@ -1,32 +1,41 @@
 <?php
-return array(
-  'console' => array(
-        'router' => array(
-            'routes' => array(
-                'generate-forms' => array(
-                    'options' => array(
-                        'route'    => 'rad form <module> [--schema=] [--table=]',
-                        'defaults' => array(
+return [
+    'console' => [
+        'router' => [
+            'routes' => [
+                'ceptrad-generate-module' => [
+                    'options' => [
+                        'route' => 'rad module <module>',
+                        'defaults' => [
                             'controller' => 'CeptRad\Controller\GenerateController',
-                            'action'     => 'form'
-                        )
-                    )
-                ),
-                'generate-crud' => array(
-                    'options' => array(
-                        'route'    => 'rad crud <module> [--schema=] [--table=] [--force]',
-                        'defaults' => array(
+                            'action' => 'module'
+                        ]
+                    ]
+                ],
+                'ceptrad-generate-forms' => [
+                    'options' => [
+                        'route' => 'rad form <module> [--schema=] [--table=]',
+                        'defaults' => [
                             'controller' => 'CeptRad\Controller\GenerateController',
-                            'action'     => 'crud'
-                        )
-                    )
-                )
-            )
-        )
-    ),
-    'controllers' => array(
-        'invokables' => array(
+                            'action' => 'form'
+                        ]
+                    ]
+                ],
+                'ceptrad-generate-crud' => [
+                    'options' => [
+                        'route' => 'rad crud <module> [--schema=] [--table=] [--force]',
+                        'defaults' => [
+                            'controller' => 'CeptRad\Controller\GenerateController',
+                            'action' => 'crud'
+                        ]
+                    ]
+                ]
+            ]
+        ]
+    ],
+    'controllers' => [
+        'invokables' => [
             'CeptRad\Controller\GenerateController' => 'CeptRad\Controller\GenerateController'
-        ),
-    ),
-);
+        ],
+    ],
+];

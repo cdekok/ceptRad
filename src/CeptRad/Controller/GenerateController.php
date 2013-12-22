@@ -16,24 +16,11 @@ class GenerateController extends AbstractConsoleController
     protected $module;
 
     /**
-     * Set event manager
-     *
-     * @param \Zend\EventManager\EventManagerInterface $events
-     */
-    public function setEventManager(\Zend\EventManager\EventManagerInterface $events)
-    {
-        // Set required properties for crud generator
-        $events->attach(\Zend\Mvc\MvcEvent::EVENT_DISPATCH, array($this, 'setRequired'));
-        parent::setEventManager($events);
-    }
-
-    /**
      * Set required options for code generator
      *
-     * @param \Zend\Mvc\MvcEvent $e
-     * @return type
+     * @return string
      */
-    public function setRequired(\Zend\Mvc\MvcEvent $e)
+    public function setRequired()
     {
         $response = $this->getResponse();
         $this->db = $this->getDb();
@@ -55,12 +42,36 @@ class GenerateController extends AbstractConsoleController
     }
 
     /**
+     * Generate module skeleton
+     */
+    public function moduleAction()
+    {
+        $config = $this->getServiceLocator()->get('ApplicationConfig');
+        $modulePath = $config['module_listener_options']['module_paths'];
+        $path = $modulePath;
+        if (count($modulePath) > 1) {
+            $option = \Zend\Console\Prompt\Select::prompt(
+                'Which module path would you like to use?',
+                $modulePath,
+                false,
+                true
+            );
+            $path = $modulePath[$option];
+        }
+        $module = $this->getRequest()->getParam('module');
+        $moduleGenerator = new \CeptRad\Generator\Module\Module();
+        echo 'Generating module skeleton in: '. $path.DIRECTORY_SEPARATOR.$module.PHP_EOL;
+        $moduleGenerator->create($module, $path);        
+    }
+    
+    /**
      * Scaffold CRUD code from database tables
      *
      * @return type
      */
     public function crudAction()
     {
+        $this->setRequired();
         $modReflection = new \ReflectionClass($this->module);
         $srcPath = dirname($modReflection->getFileName()).'/src/';
         $namespace = $modReflection->getNamespaceName();
@@ -91,6 +102,7 @@ class GenerateController extends AbstractConsoleController
      */
     public function formAction()
     {
+        $this->setRequired();
         $modReflection = new \ReflectionClass($this->module);
         $srcPath = dirname($modReflection->getFileName()).'/src/';
         $namespace = $modReflection->getNamespaceName();
@@ -116,6 +128,7 @@ class GenerateController extends AbstractConsoleController
      */
     public function formCreated(\Zend\EventManager\Event $event)
     {
+        $this->setRequired();
         $form = $event->getParam('file');
         echo 'Created form at :'.$form.PHP_EOL;
     }
